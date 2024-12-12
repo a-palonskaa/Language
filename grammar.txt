@@ -1,0 +1,26 @@
+// Grammar rules
+
+GRAM       ::= {OP ';'} + '$'                                                  // +
+
+// GRAM    ::= { NEW_FUNC } + main '(' ')' {OP ';'} + '$'
+
+ASGN       ::= ID '=' EXPR                                                     // +
+IF         ::= 'if' '(' EXPR [IE INE IA IAEQ IB IBEQ] EXPR ')' ASGN {';' ELSE} // +
+ELSE       ::= 'else' ASGN                                                     // +
+OP         ::= IF | ASGN                                                       // +
+
+// OP         ::= IF | NEW_FUNC | ASGN                                            // - add new_func
+
+EXPR       ::= TERM {[+-] TERM} *                                              // +
+TERM       ::= BASIC_EXPR {[*/] BASIC_EXPR} *                                  // +
+BASIC_EXPR ::= '-' BASIC_EXPR | '(' EXPR ')' | NUM | FUNC| ID | POW            // +
+FUNC       ::= [sin cos, ...] BASIC_EXPR                                       // +
+NUM        ::= [0-9] +                                                         // +
+ID         ::= [a-z] +                                                         // +
+POW        ::= [^] BASIC_EXPR                                                  // +
+
+// make work w current_nametable, kinda when go to another func w change nametable + we have a global namespace
+
+// NEW_FUNC   ::= [name] '(' ')'
+// NEW_FUNC_  ::= 'void' ID '(' ')' '{' {OP ';' }+ '}'
+

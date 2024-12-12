@@ -1,0 +1,74 @@
+digraph G {
+	rankdir=TB;
+	bgcolor="#DDA0DD";
+	splines=true;
+	node [shape=box, width=1, height=0.5, style=filled, bgcolor="#DDA0DD"];
+	node9656 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809278</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> ; </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809520</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809228</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x0</td></tr></table>>];
+	rank = 1
+node9576 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809228</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> = </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809250</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809200</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809278</td></tr></table>>];
+	rank = 2
+node9536 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x142809200</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>x</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809228</td></tr></table>>];
+	rank = 3
+node9616 [label=<<table border='0' cellspacing='0' bgcolor='#ADD8E6'> <tr><td>addr: 0x142809250</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>0.000000</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809228</td></tr></table>>];
+	rank = 3
+node336 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809520</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> ; </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x1428095c0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809458</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809278</td></tr></table>>];
+	rank = 2
+node136 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809458</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> ; </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809480</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x1428092a0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809520</td></tr></table>>];
+	rank = 3
+node9696 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x1428092a0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> if </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809408</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809368</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809458</td></tr></table>>];
+	rank = 4
+node9896 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809368</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> IAEQ </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809390</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809318</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x1428092a0</td></tr></table>>];
+	rank = 5
+node9816 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809318</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> + </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809340</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x1428092f0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x0</td></tr></table>>];
+	rank = 6
+node9776 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x1428092f0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>x</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809318</td></tr></table>>];
+	rank = 7
+node9856 [label=<<table border='0' cellspacing='0' bgcolor='#ADD8E6'> <tr><td>addr: 0x142809340</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>2.000000</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809318</td></tr></table>>];
+	rank = 7
+node9936 [label=<<table border='0' cellspacing='0' bgcolor='#ADD8E6'> <tr><td>addr: 0x142809390</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>3.000000</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x0</td></tr></table>>];
+	rank = 6
+node56 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809408</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> = </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809430</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x1428093e0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x1428092a0</td></tr></table>>];
+	rank = 5
+node16 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x1428093e0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>x</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809408</td></tr></table>>];
+	rank = 6
+node96 [label=<<table border='0' cellspacing='0' bgcolor='#ADD8E6'> <tr><td>addr: 0x142809430</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>7.000000</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809408</td></tr></table>>];
+	rank = 6
+node176 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809480</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> else </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x1428094d0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809458</td></tr></table>>];
+	rank = 4
+node256 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x1428094d0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> = </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x1428094f8</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x1428094a8</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809480</td></tr></table>>];
+	rank = 5
+node216 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x1428094a8</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>x</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x1428094d0</td></tr></table>>];
+	rank = 6
+node296 [label=<<table border='0' cellspacing='0' bgcolor='#ADD8E6'> <tr><td>addr: 0x1428094f8</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>1.000000</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x1428094d0</td></tr></table>>];
+	rank = 6
+node496 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x1428095c0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> ; </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809570</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809520</td></tr></table>>];
+	rank = 3
+node416 [label=<<table border='0' cellspacing='0' bgcolor='#F8C4B7'> <tr><td>addr: 0x142809570</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td> = </td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x142809598</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x142809548</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x1428095c0</td></tr></table>>];
+	rank = 4
+node376 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x142809548</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>y</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809570</td></tr></table>>];
+	rank = 5
+node456 [label=<<table border='0' cellspacing='0' bgcolor='#B7F8CA  '> <tr><td>addr: 0x142809598</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>x</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>right = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>left = 0x0</td></tr><tr><td bgcolor='black' height='1'></td></tr><tr><td>parent = 0x142809570</td></tr></table>>];
+	rank = 5
+node9656 -> node9576 [weight=10,color="black"];
+	node9576 -> node9536 [weight=10,color="black"];
+	node9576 -> node9616 [weight=10,color="black"];
+	node9656 -> node336 [weight=10,color="black"];
+	node336 -> node136 [weight=10,color="black"];
+	node136 -> node9696 [weight=10,color="black"];
+	node9696 -> node9896 [weight=10,color="black"];
+	node9896 -> node9816 [weight=10,color="black"];
+	node9816 -> node9776 [weight=10,color="black"];
+	node9816 -> node9856 [weight=10,color="black"];
+	node9896 -> node9936 [weight=10,color="black"];
+	node9696 -> node56 [weight=10,color="black"];
+	node56 -> node16 [weight=10,color="black"];
+	node56 -> node96 [weight=10,color="black"];
+	node136 -> node176 [weight=10,color="black"];
+	node176 -> node256 [weight=10,color="black"];
+	node256 -> node216 [weight=10,color="black"];
+	node256 -> node296 [weight=10,color="black"];
+	node336 -> node496 [weight=10,color="black"];
+	node496 -> node416 [weight=10,color="black"];
+	node416 -> node376 [weight=10,color="black"];
+	node416 -> node456 [weight=10,color="black"];
+	}
