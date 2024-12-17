@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include "prog_tree.h"
 #include "logger.h"
 
@@ -21,25 +22,200 @@ const char* prog_tree_t::op_name(int val) {
     return nullptr;
 }
 
+node_t* prog_tree_t::get_new_var() {
+    size_t old_ip = ip_;
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != DEF_VAR) {
+        return nullptr;
+    }
+    node_t* var = &tokens_[ip_];
+    ip_++;
+
+    var_nametable_[(int) tokens_[ip_].value].initialized = true; //NOTE -  check if there is a var
+
+    node_t* asgn = get_asgn();
+    if (asgn == nullptr) {
+        ip_ = old_ip;
+        return nullptr;
+    }
+
+    var->right = asgn;
+    asgn->parent = var;
+    return var;
+}
+
 node_t* prog_tree_t::get_gram() {
-    ip_ = 0;
+    node_t* root = nullptr;
+
+    node_t* new_func = get_new_func_();
+    node_t* semicolon = nullptr;
+    node_t* semicolon_parent = nullptr;
+
+    while (new_func != nullptr) {
+        if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
+            _syntax_error();
+            return root;
+        }
+        semicolon = &tokens_[ip_];
+        ip_++;
+
+        semicolon->left = new_func;
+        new_func->parent = semicolon;
+
+        if (semicolon_parent == nullptr) {
+            root = semicolon;
+        }
+        else {
+            semicolon_parent->right = semicolon;
+            semicolon->parent = semicolon_parent;
+        }
+
+        semicolon_parent = semicolon;
+        new_func = get_new_func_();
+    }
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != EOT) {
+        _syntax_error();
+        return root;
+    }
+    ip_++;
+    return root;
+}
+
+ssize_t prog_tree_t::add_func_to_nametable(node_t* func) {
+    if (func_nametable_size_ == 10) {  // NOTE - define 10;
+        LOG(ERROR, "Array of new funcs is full, cannot add more\n");
+        return -1;
+    }
+
+    strcpy(func_nametable_[func_nametable_size_].name, var_nametable_[(int) func->value].name);
+    func_nametable_[func_nametable_size_].var_nametable_index = (size_t) func->value;
+    func_nametable_size_++;
+    return (ssize_t) func_nametable_size_ - 1;
+}
+
+node_t* prog_tree_t::get_new_func_() {
+    size_t old_ip = ip_;
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != DECL) {
+        return nullptr;
+    }
+    node_t* decl = &tokens_[ip_];
+    ip_++;
+
+    node_t* func = get_id();
+    func->type = FUNC;
+
+    if (func == nullptr) {
+        ip_ = old_ip;
+        _syntax_error();
+        return nullptr;
+    }
+
+    ssize_t new_func_id = add_func_to_nametable(func);
+    if (new_func_id == -1) {
+        _syntax_error();
+        return nullptr;
+    }
+
+    size_t func_id = (size_t) new_func_id;
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_OPEN) {
+        ip_ = old_ip;
+        return nullptr;
+    }
+    node_t* first_bracket = &tokens_[ip_];
+    ip_++;
+
+    first_bracket->type = OP;
+    first_bracket->value = SPEC;
+
+    decl->left = first_bracket;
+    first_bracket->parent = decl;
+    first_bracket->left = func;
+    func->parent = first_bracket;
+
+
+    //TODO -  first_bracket->right = ... variable
+    if (tokens_[ip_].type == VAR) {
+        if (tokens_[ip_ + 1].type == OP && (int) tokens_[ip_ + 1].value == BRACKET_CLOSE) {
+            ip_++;
+            first_bracket->right = &tokens_[ip_];
+            tokens_[ip_].parent = first_bracket;
+            tokens_[ip_].value = SEMICOLON;
+
+            tokens_[ip_].left = &tokens_[ip_ - 1];
+            tokens_[ip_ - 1].parent = &tokens_[ip_];
+            ip_++;
+        }
+        else {
+            node_t* var_node = &tokens_[ip_++];
+            node_t* semicolon = &tokens_[ip_];
+            node_t* new_semicolon = semicolon;
+            node_t* past_semicolon = nullptr;
+
+            first_bracket->right = semicolon;
+            semicolon->parent = first_bracket;
+
+            while (tokens_[ip_].type == OP && (int) tokens_[ip_].value == SEMICOLON) {
+                new_semicolon = &tokens_[ip_];
+
+                if (past_semicolon != nullptr) {
+                    past_semicolon->right = new_semicolon;
+                    new_semicolon->parent = past_semicolon;
+                }
+
+                new_semicolon->left = var_node;
+                var_node->parent = new_semicolon;
+                ip_++;
+
+                var_node = &tokens_[ip_];
+                ip_++;
+                past_semicolon = new_semicolon;
+            }
+
+            new_semicolon->right = var_node; // FIXME - check if var
+
+            if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
+                ip_ = old_ip;
+            return nullptr;
+            }
+            ip_++;
+        }
+    }
+    else {
+        if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
+            ip_ = old_ip;
+            return nullptr;
+        }
+        ip_++;
+    }
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CODE_BLOCK_OPEN) {
+        ip_ = old_ip;
+        return nullptr;
+    }
+    ip_++;
+
     node_t* root = nullptr;
     node_t* parent_node = nullptr;
 
     node_t* val = get_op();
     if (val == nullptr) {
-        return root;
+        _syntax_error();
+        return nullptr;
     }
 
     if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
         _syntax_error();
-        return val;
+        return nullptr;
     }
 
     root = &tokens_[ip_];
+    decl->right = root;
+    root->parent = decl;
+
     ip_++;
 
-    root->parent = nullptr;
     root->left = val;
     val->parent = root;
     parent_node = root;
@@ -49,8 +225,7 @@ node_t* prog_tree_t::get_gram() {
         if (val == nullptr) break;
 
         if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
-            _syntax_error();
-            return val;
+            return nullptr;
         }
 
         parent_node->right = &tokens_[ip_];
@@ -63,11 +238,103 @@ node_t* prog_tree_t::get_gram() {
         ip_++;
     }
 
-    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != EOT) {
-        _syntax_error();
-        return root;
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CODE_BLOCK_CLOSE) {
+        return nullptr;
     }
-    return root;
+    ip_++;
+
+    func_nametable_[func_id].tree = root;
+
+    decl->right = root;
+    root->parent = decl;
+    return decl;
+}
+
+node_t* prog_tree_t::get_new_func() {
+    size_t old_ip = ip_;
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CALL) {
+        return nullptr;
+    }
+    node_t* call = &tokens_[ip_];
+    ip_++;
+
+    node_t bracket = {};
+    node_t* first_bracket = &bracket;
+    node_t* func = nullptr;
+    node_t* semicolon = nullptr;
+    for (size_t i = 0; i < func_nametable_size_; i++) {
+        if ((size_t) tokens_[ip_].value == func_nametable_[i].var_nametable_index) {
+            func = &tokens_[ip_];
+            ip_++;
+            if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_OPEN) {
+                ip_ = old_ip;
+                return nullptr;
+            }
+            ip_++;
+
+            node_t* var_node = nullptr;
+            if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
+                var_node = get_expr();
+                if (var_node == nullptr) {
+                    var_node = get_id();
+                    if (var_node == nullptr) {
+                        return nullptr;
+                    }
+                }
+
+                semicolon = &tokens_[ip_];
+                node_t* new_semicolon = semicolon;
+                node_t* past_semicolon = nullptr;
+
+                first_bracket->right = semicolon;
+                semicolon->parent = first_bracket;
+
+                while (tokens_[ip_].type == OP && (int) tokens_[ip_].value == SEMICOLON) {
+                    new_semicolon = &tokens_[ip_];
+
+                    if (past_semicolon != nullptr) {
+                        past_semicolon->right = new_semicolon;
+                        new_semicolon->parent = past_semicolon;
+                    }
+
+                    new_semicolon->left = var_node;
+                    var_node->parent = new_semicolon;
+                    ip_++;
+
+                    var_node = get_expr();
+                    if (var_node == nullptr) {
+                        var_node = get_id();
+                        if (var_node == nullptr) {
+                            return nullptr;
+                        }
+                    }
+                    past_semicolon = new_semicolon;
+                }
+
+                new_semicolon->right = var_node;
+            }
+
+            if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
+                ip_ = old_ip;
+                return nullptr;
+            }
+
+            tokens_[ip_].value = SEMICOLON;
+            tokens_[ip_].right = semicolon->right;
+            tokens_[ip_].left = semicolon->left;
+            if (semicolon->left != nullptr) semicolon->left->parent = &tokens_[ip_];
+            if (semicolon->right != nullptr) semicolon->right->parent = &tokens_[ip_];
+            call->left = &tokens_[ip_];
+            tokens_[ip_].parent = call;
+            ip_++;
+
+            call->right = func;
+            func->parent = call;
+            return call; //NOTE - maybe copy myrr meow
+        }
+    }
+    return nullptr;
 }
 
 node_t* prog_tree_t::get_asgn() {
@@ -78,7 +345,13 @@ node_t* prog_tree_t::get_asgn() {
         ip_ = old_ip;
         return nullptr;
     }
-    var_nametable_[(int) val->value].initialized = true;
+
+    if (var_nametable_[(int) val->value].initialized == false) {
+        LOG(ERROR, "Uninitialized variable\n");
+        _syntax_error();
+        ip_ = old_ip;
+        return nullptr;
+    }
 
     if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != EQ) {
         ip_ = old_ip;
@@ -107,7 +380,6 @@ bool prog_tree_t::is_compare(int val) {
     return val == IE || val == INE || val == IA || val == IAEQ || val == IB || val == IBEQ;
 }
 
-// IF::= 'if' '(' EXPR [IE INE IA IAEQ IB IBEQ] EXPR ')' ASGN {';' ELSE}
 
 node_t* prog_tree_t::get_if() {
     size_t old_ip = ip_;
@@ -208,13 +480,59 @@ node_t* prog_tree_t::get_else() {
     return root;
 }
 
+node_t* prog_tree_t::get_ret() {
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != RETURN) {
+        return nullptr;
+    }
+    return &tokens_[ip_++];
+}
+
 node_t* prog_tree_t::get_op() {
     node_t* val = get_if();
     if (val != nullptr) {
         return val;
     }
 
+    val = get_ret();
+    if (val != nullptr) {
+        return val;
+    }
+
+    val = get_new_var();
+    if (val != nullptr) {
+        return val;
+    }
+
+    val = get_new_func();
+    if (val != nullptr) {
+        return val;
+    }
+
+    val = get_in_out();
+    if (val != nullptr) {
+        return val;
+    }
+
     return get_asgn(); //NOTE - maybe nullptr
+}
+
+node_t* prog_tree_t::get_in_out() {
+    if (!(tokens_[ip_].type == OP && ((int) tokens_[ip_].value == IN || (int) tokens_[ip_].value == OUT))) {
+        return nullptr;
+    }
+    node_t* cmd_node = &tokens_[ip_];
+
+    ip_++;
+
+    if (tokens_[ip_].type != VAR) {
+        _syntax_error();
+        return nullptr;
+    }
+
+    cmd_node->left = &tokens_[ip_];
+    tokens_[ip_].parent = cmd_node;
+    ip_++;
+    return cmd_node;
 }
 
 node_t* prog_tree_t::get_expr() {

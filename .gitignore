@@ -2,3 +2,7 @@
 .DS_Store
 build
 logger.txt
+backend_logger.txt
+copy.txt
+logger.txt
+out.txt

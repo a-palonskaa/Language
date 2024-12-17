@@ -19,8 +19,8 @@ node_t* prog_tree_t::token_init(text_t* text) {
 
     tokenize_text(text);
 
-    print_tokens_array();
-    print_var_nametable();
+    // print_tokens_array();
+    // print_var_nametable();
 
     root_ = link_tokens();
     return root_;
@@ -173,7 +173,7 @@ err_t prog_tree_t::parse_identificator(text_t* text, size_t* ip, node_t* node) {
 
     size_t i = 0;
     char name[MAX_NAME_LEN] = "";
-    while ((i < MAX_NAME_LEN) &&
+    while ((i < MAX_NAME_LEN) && (*ip < text->symbols_amount) &&
            (isalpha(text->symbols[*ip]) ||
             isdigit(text->symbols[*ip]) ||
             text->symbols[*ip] == '_')) {

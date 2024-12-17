@@ -46,6 +46,7 @@ void prog_tree_t::print_preorder(node_t* node) {
             print_operator(stdout, node->value);
             break;
         }
+        case FUNC:
         case VAR: {
             printf("%s", var_nametable_[(int) node->value].name);
             break;
@@ -80,6 +81,7 @@ void prog_tree_t::print_inorder(FILE* ostream, node_t* node, int parent_preceden
             current_precedence = get_operator_precedence((int) node->value);
             break;
         case VAR:
+        case FUNC:
         case NUM:
             current_precedence = -1;
             break;
@@ -220,6 +222,7 @@ void prog_tree_t::print_inorder(FILE* ostream, node_t* node, int parent_preceden
             }
             break;
         }
+        case FUNC:
         case VAR: {
             fprintf(ostream, "%s", var_nametable_[(int) node->value].name);
             break;
@@ -381,10 +384,21 @@ void prog_tree_t::print_nodes(FILE* tree_file, node_t* node, size_t rank) {
 
     switch (node->type) {
         case OP:
+            if ((int) node->value == DECL) {
+                fprintf(tree_file, "'#F804B7'");
+                break;
+            }
+            if ((int) node->value == SEMICOLON) {
+                fprintf(tree_file, "'#A80100'");
+                break;
+            }
             fprintf(tree_file, "'#F8C4B7'");
             break;
         case VAR:
             fprintf(tree_file, "'#B7F8CA  '");
+            break;
+        case FUNC:
+            fprintf(tree_file, "'#FFAAFF  '");
             break;
         case NUM:
             fprintf(tree_file, "'#ADD8E6'");
@@ -407,6 +421,9 @@ void prog_tree_t::print_nodes(FILE* tree_file, node_t* node, size_t rank) {
             break;
         case NUM:
             fprintf(tree_file, "%f", node->value);
+            break;
+        case FUNC:
+            fprintf(tree_file,  "%s", var_nametable_[(int) node->value].name);
             break;
         default:
             break;

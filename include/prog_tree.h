@@ -9,9 +9,10 @@
 #define MAX_NAME_LEN 21
 
 typedef enum {
-    NUM = 0,
-    VAR = 1,
-    OP  = 2,
+    NUM  = 0,
+    VAR  = 1,
+    OP   = 2,
+    FUNC = 3,
 } type_t;
 
 typedef enum {
@@ -41,18 +42,24 @@ typedef enum {
     ARCTH  = 22,
     ARCCTH = 23,
 
-    EQ   = 50, // =
-    IE   = 51, // ==
-    INE  = 52, // !=
-    IA   = 53, // >
-    IAEQ = 54, // >=
-    IB   = 55, // <
-    IBEQ = 56, // <=
+    EQ     = 50, // =
+    IE     = 51, // ==
+    INE    = 52, // !=
+    IA     = 53, // >
+    IAEQ   = 54, // >=
+    IB     = 55, // <
+    IBEQ   = 56, // <=
 
-    IF     = 75,
-    ELSE   = 76,
-    WHILE  = 77,
-    RETURN = 78,
+    IN      = 72,
+    OUT     = 73,
+    CALL    = 74,
+    IF      = 75,
+    ELSE    = 76,
+    WHILE   = 77,
+    RETURN  = 78,
+    DECL    = 79,
+    DEF_VAR = 80,
+    SPEC    = 81,
 
     BRACKET_OPEN     = 100,
     BRACKET_CLOSE    = 101,
@@ -60,7 +67,7 @@ typedef enum {
     CODE_BLOCK_CLOSE = 103,
     SEMICOLON        = 104,
 
-    EOT           = 1000,
+    EOT             = 1000,
 } op_t;
 
 typedef struct {
@@ -133,10 +140,16 @@ const func_name_table_t func_name_table[] = {
     { ">=",     IAEQ},
     { "<",      IB},
     { "<=",     IBEQ},
+    { "scan",   IN},
+    { "print",  OUT},
+    { "call",   CALL},
     { "if",     IF},
     { "else",   ELSE},
     { "while",  WHILE},
     { "return", RETURN},
+    { "decl",   DECL},
+    { "var",    DEF_VAR},
+    { "spec",   SPEC},
     { "(",      BRACKET_OPEN},
     { ")",      BRACKET_CLOSE},
     { "{",      CODE_BLOCK_OPEN},
@@ -147,6 +160,7 @@ const func_name_table_t func_name_table[] = {
 const size_t func_name_table_len = sizeof(func_name_table) / sizeof(func_name_table[0]);
 
 typedef struct {
+    size_t var_nametable_index;
     char name[MAX_NAME_LEN];
     node_t* tree;
     name_t var_nametable_[10];
@@ -155,8 +169,14 @@ typedef struct {
 
 class prog_tree_t {
 public:
+    node_t* root_{nullptr};
+    name_t var_nametable_[100];
+    size_t jmp_cnt_{0};
+
     err_t init(FILE* data_file);
-    void dtor();
+    void tree_dtor();
+    void tokens_dtor();
+    void delete_subtree_r(node_t* node);
 
     void set_dump_ostream(FILE* ostream);
     void print_preorder_();
@@ -173,6 +193,8 @@ public:
 
     void print_tree_to_tex(FILE* ostream, node_t* root);
     void print_exp_to_tex(FILE* ostream, node_t* node);
+    void deserialization(FILE* ostream);
+    void serialization(FILE* istream);
 private:
     int get_operator_precedence(int op);
     void print_to_tex(FILE* ostream, node_t* node);
@@ -193,6 +215,13 @@ private:
     node_t* get_num();
     node_t* get_id();
     node_t* get_func();
+    node_t* get_new_func_();
+    node_t* get_new_func();
+    node_t* get_new_var();
+    node_t* get_ret();
+    node_t* get_in_out();
+
+    ssize_t add_func_to_nametable(node_t* func);
 
     node_t* token_init(text_t* text);
     node_t* link_tokens();
@@ -211,10 +240,18 @@ private:
     bool parse_operator(text_t* text, size_t* ip, node_t* node);
     const char* op_name(int val);
     bool is_compare(int val);
-private:
-    node_t* root_{nullptr};
 
-    name_t var_nametable_[100];
+    void print_node_data(FILE* ostream, node_t* node);
+    void print_node_r(FILE* ostream, node_t* node, size_t tab_cnt);
+
+    node_t* new_node(type_t type, double val);
+    double parse_variable(char* buffer);
+    double parse_func(char* buffer);
+    double parse_operator(char* buffer);
+    double parse_number(char* buffer);
+    node_t* parse_node_r(text_t* text, size_t* ip);
+    void skip_spaces(text_t* text, size_t* ip);
+private:
     size_t var_nametable_size_{0};
 
     new_func_name_t func_nametable_[10];

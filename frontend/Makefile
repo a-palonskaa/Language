@@ -13,7 +13,7 @@ CFLAGS = -Wall -std=c++17 -Wall -Wextra -Weffc++ -Wc++14-compat -Wmissing-declar
 		 -fPIE -Werror=vla
 COMMON_DIR = build/libs
 LIBS_DIR = $(COMMON_DIR)
-BACKEND_DIR = backend
+
 BUILD_DIR = build
 
 INCLUDES = include common/logger common/text
@@ -46,12 +46,6 @@ libs: build/libs/libmylibrary.a
 build/libs/libmylibrary.a: $(OBJECTS_FOR_LIB)
 	@mkdir -p $(BUILD_DIR)/libs
 	@ar rcs $@ $^
-
-back:
-	@$(MAKE) -C $(BACKEND_DIR) all
-
-back_ec:
-	@$(MAKE) -C $(BACKEND_DIR) echo
 
 clean:
 	@for dir in $(SUBDIRS); do  \
