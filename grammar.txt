@@ -1,19 +1,19 @@
 // Grammar rules
 
-GRAM       ::= { NEW_FUNC ';'}+ '$'                                            // +
-NEW_FUNC_  ::= 'decl' ID '(' {VAR} {,VAR}* ')' '{' {OP ';'}+ '}'               // +
-ASGN       ::= ID '=' EXPR                                                     // +
-IF         ::= 'if' '(' EXPR [IE INE IA IAEQ IB IBEQ] EXPR ')' ASGN {';' ELSE} // +
-ELSE       ::= 'else' ASGN                                                     // +
-OP         ::= NEW_VAR | IF | NEW_FUNC | ASGN | RET | IN_OUT                   // +
-EXPR       ::= TERM {[+-] TERM} *                                              // +
-TERM       ::= BASIC_EXPR {[*/] BASIC_EXPR} *                                  // +
-BASIC_EXPR ::= '-' BASIC_EXPR | '(' EXPR ')' | NUM | FUNC| ID | POW            // +
-FUNC       ::= [sin cos, ...] BASIC_EXPR                                       // +
-NUM        ::= [0-9] +                                                         // +
-ID         ::= [a-z] +                                                         // +
-POW        ::= [^] BASIC_EXPR                                                  // +
-NEW_FUNC   ::= 'call' [name] '(' EXPR | VAR ')'                                // +
-NEW_VAR    ::= 'var' ASGN                                                      // +
-RET        ::= 'return'                                                        // +
-IN_OUT     ::= {'in' | 'out'} VAR                                              // +
+GRAM       ::= { NEW_FUNC_ ';'}+ '$'                                                                          // +
+NEW_FUNC_  ::= 'decl' ID '(' {VAR} {,VAR}* ')' '{' {OP ';'}+ '}'                                              // +
+ASGN       ::= ID '=' EXPR                                                                                    // +
+IF         ::= 'if' '(' EXPR [IE INE IA IAEQ IB IBEQ] EXPR ')' '{' {OP ';'}+ '}' {ELSE '{' {OP ';'}+ '}'}     // +
+ELSE       ::= 'else' ASGN                                                                                    // +
+OP         ::= NEW_VAR | IF | NEW_FUNC | ASGN | RET | IN_OUT                                                  // +
+EXPR       ::= TERM {[+-] TERM} *                                                                             // +
+TERM       ::= BASIC_EXPR {[*/] BASIC_EXPR} *                                                                 // +
+BASIC_EXPR ::= '-' BASIC_EXPR | '(' EXPR ')' | NUM | FUNC| ID | POW                                           // +
+FUNC       ::= [sin cos, ...] BASIC_EXPR                                                                      // +
+NUM        ::= [0-9] +                                                                                        // +
+ID         ::= [a-z] +                                                                                        // +
+POW        ::= [^] BASIC_EXPR                                                                                 // +
+NEW_FUNC   ::= 'call' [name] '(' EXPR | VAR ')'                                                               // +
+NEW_VAR    ::= 'var' ASGN                                                                                     // +
+RET        ::= 'return'                                                                                       // +
+IN_OUT     ::= {'in' | 'out'} VAR                                                                             // +

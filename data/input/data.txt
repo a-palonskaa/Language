@@ -1,22 +1,65 @@
-decl meow(va1;va2;va3) {
-    var c = 0;
-    if (c == 1) c = 9;
-    return;
-};
-
 decl main() {
-var x = 0;
-scan x;
-call meow(1;2;2);
-if (x + 2 >= 3)
-    x = x + 7;
-else
-    x = x + 1;
+    var a = 0;
+    var b = 0;
+    var c = 0;
 
-call meow(1;2;2);
-var y = x - 1;
-print x;
-print y;
-return;
+    var res = 0;
+
+    scan a;
+    scan b;
+    scan c;
+
+    if (a == 0) {
+        if (b == 0) {
+            if (c == 0) {
+                res = 666;
+                print res;
+                return;
+            }
+            else {
+                res = -666;
+                print res;
+                return;
+            };
+        }
+        else {
+            if (c == 0) {
+                res = 0;
+                print res;
+                return;
+            }
+            else {
+                res = 0 - b;
+                res = res / c;
+                print res;
+                return;
+            };
+        };
+    }
+    else {
+        var discr = b^2 - 4 * a * c;
+        if (discr == 0) {
+            res = (0 - b) / (2 * a);
+            print res;
+            return;
+        }
+        else {
+            res = 0;
+        };
+
+        if (discr < 0) {
+            res = -666;
+            print res;
+            return;
+        }
+        else {
+            discr = discr^(0.5);
+            res = (0 -b - discr) / (2 * a);
+            print res;
+            res = (0 -b + discr) / (2 * a);
+            print res;
+            return;
+        };
+    };
 };
 $

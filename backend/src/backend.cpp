@@ -16,6 +16,8 @@ void backend_t::dtor() {
 void backend_t::translate_to_asm(FILE* ostream) {
     assert(ostream != nullptr);
 
+    fprintf(ostream, "push 0\n");
+    fprintf(ostream, "pop hx\n");
     fprintf(ostream, "call main:\n");
     fprintf(ostream, "hlt\n");
 
@@ -30,6 +32,7 @@ void backend_t::translate_to_asm(FILE* ostream) {
 void backend_t::print_func(FILE* ostream, node_t* decl) {
     assert(ostream != nullptr);
     assert(decl != nullptr);
+    size_t ram_index = 0; //FIXME -  suka huinya ebanay
 
     if (decl->left == nullptr || decl->left->type != OP || (int) decl->left->value != SPEC) {
         LOG(ERROR, "Syntax err at %p: %d %d\n", decl, decl->left->type == OP, (int) decl->left->value == SPEC);
@@ -41,8 +44,42 @@ void backend_t::print_func(FILE* ostream, node_t* decl) {
     }
 
     fprintf(ostream, "%s:\n", prog_tree_.var_nametable_[(int) decl->left->left->value].name);
+    fprintf(ostream, "push hx\n");
+    fprintf(ostream, "push 100\n");
+    fprintf(ostream, "add\n");
+    fprintf(ostream, "pop hx\n");
 
-    print_func_body(ostream, decl->right, 0);
+    size_t i = 0;
+    node_t* current_node = decl->left->right;
+    while (1) {
+        if (current_node == nullptr) break;
+        if (current_node->type == VAR) {
+            fprintf(ostream, "push %s\n", reg_by_num(i));
+            fprintf(ostream, "pop [hx+%zu]\n", (size_t) current_node->value);
+            break;
+        }
+        else if (current_node->type ==  OP && (int) current_node->value == SEMICOLON) {
+            fprintf(ostream, "push %s\n", reg_by_num(i));
+            fprintf(ostream, "pop [hx+%zu]\n", (size_t) current_node->left->value);
+            current_node = current_node->right;
+            i++;
+        }
+    }
+
+    print_func_body(ostream, decl->right, ram_index);
+}
+
+const char* backend_t::reg_by_num(size_t i) {
+    switch (i) {
+        case 0: return "ax";
+        case 1: return "bx";
+        case 2: return "cx";
+        case 3: return "dx";
+        case 4: return "ex";
+        case 5: return "fx";
+        case 6: return "gx";
+        default: return "";
+    }
 }
 
 void backend_t::print_func_body(FILE* ostream, node_t* node, size_t ram_index) {
@@ -75,7 +112,7 @@ void backend_t::print_equal(FILE* ostream, node_t* node, size_t ram_index) {
     if (node == nullptr) return;
 
     push_expr(ostream, node->right, ram_index);
-    fprintf(ostream, "pop [%zu]\n", (size_t) node->left->value + ram_index);
+    fprintf(ostream, "pop [hx+%zu]\n", (size_t) node->left->value);
 }
 
 void backend_t::print_expr(FILE* ostream, node_t* node, size_t ram_index) {
@@ -85,14 +122,34 @@ void backend_t::print_expr(FILE* ostream, node_t* node, size_t ram_index) {
     switch ((int) node->value) {
         case DEF_VAR: {
             push_expr(ostream, node->left->right, ram_index); // FIXME - check errors
-            fprintf(ostream, "pop [%zu]\n", (size_t) node->left->left->value + ram_index);
+            fprintf(ostream, "pop [hx+%zu]\n", (size_t) node->left->left->value);
             break;
         }
         case CALL: {
-            fprintf(ostream, "call %s:\n", prog_tree_.var_nametable_[(int) node->left->value].name);
+            size_t i = 0;
+            node_t* current_node = node->left;
+            while (1) {
+                if (current_node == nullptr) break;
+                if (current_node->type ==  OP && (int) current_node->value == SEMICOLON) {
+                    push_expr(ostream, current_node->left, ram_index);
+                    fprintf(ostream, "pop %s\n", reg_by_num(i));
+                    current_node = current_node->right;
+                    i++;
+                }
+                else {
+                    push_expr(ostream, current_node, ram_index);
+                    fprintf(ostream, "pop %s\n", reg_by_num(i));
+                    break;
+                }
+            }
+            fprintf(ostream, "call %s:\n", prog_tree_.var_nametable_[(int) node->right->value].name);
             break;
         }
         case RETURN: {
+            fprintf(ostream, "push hx\n");
+            fprintf(ostream, "push 100\n");
+            fprintf(ostream, "sub\n");
+            fprintf(ostream, "pop hx\n");
             fprintf(ostream, "ret\n");
             break;
         }
@@ -110,11 +167,11 @@ void backend_t::print_expr(FILE* ostream, node_t* node, size_t ram_index) {
         }
         case IN: {
             fprintf(ostream, "in\n");
-            fprintf(ostream, "pop [%zu]\n", (size_t) node->left->value + ram_index);
+            fprintf(ostream, "pop [hx+%zu]\n", (size_t) node->left->value);
             break;
         }
         case OUT: {
-            fprintf(ostream, "push [%zu]\n", (size_t) node->left->value + ram_index);
+            fprintf(ostream, "push [hx+%zu]\n", (size_t) node->left->value);
             fprintf(ostream, "out\n");
             break;
         }
@@ -126,6 +183,7 @@ void backend_t::print_expr(FILE* ostream, node_t* node, size_t ram_index) {
 void backend_t::print_if_else(FILE* ostream, node_t* node, size_t ram_index) {
     assert(ostream != nullptr);
     if (node == nullptr) return;
+
 
     node_t* if_node = node->left;
     if (if_node == nullptr || if_node->type != OP || (int) if_node->value != IF) {
@@ -166,7 +224,7 @@ void backend_t::print_if_else(FILE* ostream, node_t* node, size_t ram_index) {
             break;
     }
 
-    node_t* my_node = else_node;
+    node_t* my_node = else_node->left;
     while (my_node != nullptr) {
         print_expr(ostream, my_node->left, ram_index);
         my_node = my_node->right;
@@ -175,11 +233,12 @@ void backend_t::print_if_else(FILE* ostream, node_t* node, size_t ram_index) {
     fprintf(ostream, "jmp finish_%zu:\n", num);
     fprintf(ostream, "%zu:\n", num);
 
-    print_expr(ostream, if_node->right, ram_index);
-    // while (my_node != nullptr && my_node->type == OP && (int) my_node->value == SEMICOLON) {
-    //     print_expr(ostream, my_node->right, ram_index);
-    //     my_node = my_node->right;
-    // }
+    my_node = if_node->right;
+    while (my_node != nullptr) {
+        print_expr(ostream, my_node->left, ram_index);
+        my_node = my_node->right;
+    }
+
     fprintf(ostream, "finish_%zu:\n", num);
 }
 
@@ -191,7 +250,7 @@ void backend_t::push_expr(FILE* ostream, node_t* node, size_t ram_index) {
         fprintf(ostream, "push %lg\n", node->value);
     }
     else if (node->type == VAR) {
-        fprintf(ostream, "push [%zu]\n", ram_index + (size_t) node->value);
+        fprintf(ostream, "push [hx+%zu]\n", (size_t) node->value);
     }
     else if (node->type == FUNC) {
         fprintf(ostream, "call %s:\n", prog_tree_.var_nametable_[(int)node->value].name);

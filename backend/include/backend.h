@@ -20,6 +20,7 @@ public:
     void print_op(FILE* ostream, node_t* node, size_t ram_index);
     void print_if_else(FILE* ostream, node_t* node, size_t ram_index);
     void print_equal(FILE* ostream, node_t* node, size_t ram_index);
+    const char* reg_by_num(size_t i);
 private:
     prog_tree_t prog_tree_;
 };

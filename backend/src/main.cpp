@@ -6,7 +6,7 @@
 #include "logger.h"
 
 int main() {
-    FILE* logger = fopen("../backend_logger.txt", "w");
+    FILE* logger = fopen("backend_logger.txt", "w");
     if (logger == nullptr) {
         LOG(ERROR, "Failed to open a logger ostream\n");
         return 1;
@@ -21,7 +21,7 @@ int main() {
         return 1;
     }
 
-    FILE* dump_file = fopen("outing.txt", "w");
+    FILE* dump_file = fopen("in.asm", "w");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;

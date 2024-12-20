@@ -1,0 +1,20 @@
+decl meow(val1;val2;val3) {
+    if (val1 <= val2) {
+        val3 = val3 * val1;
+        val1 = val1 + 1;
+        call meow(val1;val2;val3);
+        return;
+    }
+    else {
+        print val3;
+        return;
+    };
+};
+
+decl main() {
+var x = 0;
+scan x;
+call meow(1;x;1);
+return;
+};
+$

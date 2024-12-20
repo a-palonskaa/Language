@@ -33,7 +33,7 @@ int main() {
         return 1;
     }
 
-    FILE* dump_file = fopen("out.txt", "w");
+    FILE* dump_file = fopen("./backend/out.txt", "w");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;
@@ -43,7 +43,7 @@ int main() {
 
     tree.set_dump_ostream(file);
     tree.init(istream);
-   // tree.serialization(dump_file);
+    //tree.serialization(dump_file);
     tree.dump(tree.root_);
     tree.deserialization(dump_file);
 

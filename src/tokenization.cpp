@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
+#include <math.h>
 #include "text_lib.h"
 #include "logger.h"
 #include "prog_tree.h"
@@ -19,8 +20,8 @@ node_t* prog_tree_t::token_init(text_t* text) {
 
     tokenize_text(text);
 
-    // print_tokens_array();
-    // print_var_nametable();
+   //print_tokens_array();
+   // print_var_nametable();
 
     root_ = link_tokens();
     return root_;
@@ -91,6 +92,10 @@ bool prog_tree_t::parse_operator(text_t* text, size_t* ip, node_t* node) {
         }
         case '/': {
             node->value = DIV;
+            break;
+        }
+        case '^': {
+            node->value = POW;
             break;
         }
         case '$': {
@@ -300,6 +305,7 @@ void prog_tree_t::parse_number(text_t* text, size_t* ip, node_t* node) {
         (*ip)++;
     }
 
-    node->value = (dec == 0) ? (double) num : (double) num / dec;
+    printf("");
+    node->value = (dec == 0) ? (double) num : (double) num / pow(10, dec);
     return;
 }

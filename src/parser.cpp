@@ -30,7 +30,7 @@ node_t* prog_tree_t::get_new_var() {
     node_t* var = &tokens_[ip_];
     ip_++;
 
-    var_nametable_[(int) tokens_[ip_].value].initialized = true; //NOTE -  check if there is a var
+    var_nametable_[(int) tokens_[ip_].value].initialized = true; // NOTE -  check if there is a var
 
     node_t* asgn = get_asgn();
     if (asgn == nullptr) {
@@ -134,9 +134,9 @@ node_t* prog_tree_t::get_new_func_() {
     first_bracket->left = func;
     func->parent = first_bracket;
 
-
     //TODO -  first_bracket->right = ... variable
     if (tokens_[ip_].type == VAR) {
+        var_nametable_[(int) tokens_[ip_].value].initialized = true; //FIXME - vision space
         if (tokens_[ip_ + 1].type == OP && (int) tokens_[ip_ + 1].value == BRACKET_CLOSE) {
             ip_++;
             first_bracket->right = &tokens_[ip_];
@@ -166,6 +166,7 @@ node_t* prog_tree_t::get_new_func_() {
 
                 new_semicolon->left = var_node;
                 var_node->parent = new_semicolon;
+                var_nametable_[(int) var_node->value].initialized = true;
                 ip_++;
 
                 var_node = &tokens_[ip_];
@@ -174,6 +175,7 @@ node_t* prog_tree_t::get_new_func_() {
             }
 
             new_semicolon->right = var_node; // FIXME - check if var
+            var_nametable_[(int) var_node->value].initialized = true;
 
             if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
                 ip_ = old_ip;
@@ -323,8 +325,10 @@ node_t* prog_tree_t::get_new_func() {
             tokens_[ip_].value = SEMICOLON;
             tokens_[ip_].right = semicolon->right;
             tokens_[ip_].left = semicolon->left;
+
             if (semicolon->left != nullptr) semicolon->left->parent = &tokens_[ip_];
             if (semicolon->right != nullptr) semicolon->right->parent = &tokens_[ip_];
+
             call->left = &tokens_[ip_];
             tokens_[ip_].parent = call;
             ip_++;
@@ -347,7 +351,7 @@ node_t* prog_tree_t::get_asgn() {
     }
 
     if (var_nametable_[(int) val->value].initialized == false) {
-        LOG(ERROR, "Uninitialized variable\n");
+        LOG(ERROR, "Uninitialized variable %s\n", var_nametable_[(int) val->value].name);
         _syntax_error();
         ip_ = old_ip;
         return nullptr;
@@ -419,64 +423,151 @@ node_t* prog_tree_t::get_if() {
     comp->right = _val;
     comp->left  = val;
 
+    root->left = comp;
+    comp->parent = root;
+
     if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != BRACKET_CLOSE) {
         ip_ = old_ip;
         return nullptr;
     }
     ip_++;
 
-    node_t* val1 = get_asgn();
-    if (val1 == nullptr) {
+    node_t* linker = &tokens_[ip_];
+    if (linker->type != OP || (int) linker->value != CODE_BLOCK_OPEN) {
         ip_ = old_ip;
         return nullptr;
     }
+    ip_++;
 
-    root->right = val1;
-    val1->parent = root;
-
-    root->left = comp;
-    comp->parent = root;
-
-    size_t old_ip2 = ip_;
-    node_t* else_node = nullptr;
-    if (tokens_[ip_].type == OP && (int) tokens_[ip_].value == SEMICOLON) {
-        node_t* semicolon_node = &tokens_[ip_];
-        ip_++;
-
-        else_node = get_else();
-        if (else_node == nullptr) {
-            ip_ = old_ip2;
-        }
-        else {
-            semicolon_node->right = else_node;
-            else_node->parent = semicolon_node;
-
-            semicolon_node->left = root;
-            root->parent = semicolon_node;
-
-            root = semicolon_node;
-        }
+    node_t* op_val = get_op();
+    if (op_val == nullptr) {
+        _syntax_error();
+        return nullptr;
     }
 
-    return root; //NOTE -  change the parent of the root;
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
+        _syntax_error();
+        return nullptr;
+    }
+
+    node_t* op_expr_root = &tokens_[ip_];
+    ip_++;
+
+    op_expr_root->left = op_val;
+    op_val->parent = op_expr_root;
+    node_t* parent_node = op_expr_root;
+
+    while (1) {
+        op_val = get_op();
+        if (op_val == nullptr) break;
+
+        if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
+            return nullptr;
+        }
+
+        parent_node->right = &tokens_[ip_];
+        tokens_[ip_].parent = parent_node;
+
+        tokens_[ip_].left = op_val;
+        op_val->parent = &tokens_[ip_];
+
+        parent_node = &tokens_[ip_];
+        ip_++;
+    }
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CODE_BLOCK_CLOSE) {
+        return nullptr;
+    }
+    ip_++;
+
+    root->right = op_expr_root;
+    op_expr_root->parent = root;
+
+//     node_t* val1 = get_asgn();
+//     if (val1 == nullptr) {
+//         ip_ = old_ip;
+//         return nullptr;
+//     }
+//
+//     root->right = val1;
+//     val1->parent = root;
+//
+//     root->left = comp;
+//     comp->parent = root;
+
+    node_t* else_node = nullptr;
+    else_node = get_else();
+    if (else_node == nullptr) {
+        ;
+    }
+    else {
+        linker->right = else_node;
+        else_node->parent = linker;
+
+        linker->left = root;
+        root->parent = linker;
+
+        root = linker;
+        linker->value = SEMICOLON;
+    }
+    return root;
 }
 
 node_t* prog_tree_t::get_else() {
-    size_t old_ip = ip_;
     if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != ELSE) {
         return nullptr;
     }
     node_t* root = &tokens_[ip_];
     ip_++;
 
-    node_t* val = get_asgn();
-    if (val == nullptr) {
-        ip_ = old_ip;
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CODE_BLOCK_OPEN) {
+        return nullptr;
+    }
+    ip_++;
+
+    node_t* op_val = get_op();
+    if (op_val == nullptr) {
+        _syntax_error();
         return nullptr;
     }
 
-    root->right = val;
-    val->parent = root;
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
+        _syntax_error();
+        return nullptr;
+    }
+
+    node_t* op_expr_root = &tokens_[ip_];
+    ip_++;
+
+    op_expr_root->left = op_val;
+    op_val->parent = op_expr_root;
+    node_t* parent_node = op_expr_root;
+
+    while (1) {
+        op_val = get_op();
+        if (op_val == nullptr) break;
+
+        if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != SEMICOLON) {
+            return nullptr;
+        }
+
+        parent_node->right = &tokens_[ip_];
+        tokens_[ip_].parent = parent_node;
+
+        tokens_[ip_].left = op_val;
+        op_val->parent = &tokens_[ip_];
+
+        parent_node = &tokens_[ip_];
+        ip_++;
+    }
+
+    if (tokens_[ip_].type != OP || (int) tokens_[ip_].value != CODE_BLOCK_CLOSE) {
+        return nullptr;
+    }
+    ip_++;
+
+    root->right = op_expr_root;
+    op_expr_root->parent = root;
     return root;
 }
 
@@ -609,7 +700,7 @@ node_t* prog_tree_t::get_basic_expr() {
     }
     else if ((val1 = get_id()) != nullptr) {
         if (var_nametable_[(int) val1->value].initialized == false) {
-            LOG(ERROR, "Uninitialized variable \n");
+            LOG(ERROR, "Uninitialized variable %s\n", var_nametable_[(int) val1->value].name);
             _syntax_error();
             return nullptr;
         }

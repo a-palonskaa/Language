@@ -95,7 +95,6 @@ node_t* prog_tree_t::parse_node_r(text_t* text, size_t* ip) {
 
     char token[MAX_NAME_LEN] = "";
     size_t _ip = 0;
-
     skip_spaces(text, ip);
 
     if (*ip == text->symbols_amount) {
@@ -133,7 +132,6 @@ node_t* prog_tree_t::parse_node_r(text_t* text, size_t* ip) {
     }
 
     if (node == nullptr) {
-        LOG(ERROR, "node is null\n");
         return nullptr;
     }
 
@@ -152,11 +150,11 @@ node_t* prog_tree_t::parse_node_r(text_t* text, size_t* ip) {
     skip_spaces(text, ip);
 
     if (text->symbols[*ip] == '{') {
-            node->right = parse_node_r(text, ip);
-            if (node->right != nullptr) {
-                node->right->parent = node;
-            }
+        node->right = parse_node_r(text, ip);
+        if (node->right != nullptr) {
+            node->right->parent = node;
         }
+    }
     else {
         node->right = nullptr;
     }
@@ -188,7 +186,21 @@ double prog_tree_t::parse_operator(char* buffer) {
         if (strstr(buffer, "IAEQ") != nullptr) {  //NOTE - fixme babe
             return IAEQ;
         }
-
+        if (strstr(buffer, "IA") != nullptr) {  //NOTE - fixme babe
+            return IA;
+        }
+        if (strstr(buffer, "IBEQ") != nullptr) {  //NOTE - fixme babe
+            return IBEQ;
+        }
+        if (strstr(buffer, "IB") != nullptr) {  //NOTE - fixme babe
+            return IB;
+        }
+        if (strstr(buffer, "INE") != nullptr) {  //NOTE - fixme babe
+            return INE;
+        }
+        if (strstr(buffer, "IE") != nullptr) {  //NOTE - fixme babe
+            return IE;
+        }
     }
     return NULL;
 }

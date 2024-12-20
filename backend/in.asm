@@ -33,8 +33,6 @@ mul
 push [hx+3]
 mul
 sub
-push 0.5
-pow
 pop [hx+5]
 push [hx+5]
 push 0
@@ -62,6 +60,10 @@ finish_1:
 push [hx+5]
 push 0
 jb 2:
+push [hx+5]
+push 0.5
+pow
+pop [hx+5]
 push 0
 push [hx+2]
 sub
