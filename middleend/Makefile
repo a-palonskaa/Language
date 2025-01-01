@@ -13,14 +13,14 @@ CFLAGS = -Wall -std=c++17 -Wall -Wextra -Weffc++ -Wc++14-compat -Wmissing-declar
          -fPIE -Werror=vla
 
 BUILD_DIR = ../build
-BACKEND_DIR = backend
+BACKEND_DIR = middleend
 INCLUDES = ../frontend/include ../common/logger ../common/text include
-SOURCES = src/main.cpp src/backend.cpp
-OBJECTS = $(addprefix $(BUILD_DIR)/backend/, $(SOURCES:%.cpp=%.o))
+SOURCES = src/main.cpp src/middleend.cpp
+OBJECTS = $(addprefix $(BUILD_DIR)/middleend/, $(SOURCES:%.cpp=%.o))
 
 CFLAGS += $(addprefix -I, $(INCLUDES))
 LDFLAGS = -L$(BUILD_DIR)/libs -lcommon -lmylibrary
-EXECUT = $(BUILD_DIR)/backy
+EXECUT = $(BUILD_DIR)/middle
 
 all: $(EXECUT)
 
@@ -28,9 +28,9 @@ $(EXECUT): $(OBJECTS)
 	@mkdir -p $(@D)
 	@$(CC) $(LDFLAGS) $^ -o $@
 
-$(BUILD_DIR)/backend/src/%.o: src/%.cpp
+$(BUILD_DIR)/middleend/src/%.o: src/%.cpp
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -MP -MMD -c $< -o $@
 
 clean:
-	@rm -rf $(BUILD_DIR)/backend/src/*.o $(BUILD_DIR)/backend/backend
+	@rm -rf $(BUILD_DIR)/middleend/src/*.o $(BUILD_DIR)/middleend/middleend

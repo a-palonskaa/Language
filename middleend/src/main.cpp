@@ -2,11 +2,11 @@
 #include <errno.h>
 #include <string.h>
 #include "prog_tree.h"
-#include "backend.h"
+#include "middleend.h"
 #include "logger.h"
 
 int main() {
-    FILE* logger = fopen("logs/backend_logger.txt", "w");
+    FILE* logger = fopen("logs/middleend_logger.txt", "w");
     if (logger == nullptr) {
         LOG(ERROR, "Failed to open a logger ostream\n");
         return 1;
@@ -15,13 +15,13 @@ int main() {
     LoggerSetFile(logger);
     LoggerSetLevel(INFO);
 
-    FILE* istream = fopen("m_out.txt", "r");
+    FILE* istream = fopen("out.txt", "r");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;
     }
 
-    FILE* dump_file = fopen("in.asm", "w");
+    FILE* dump_file = fopen("m_out.txt", "w");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;
@@ -33,12 +33,12 @@ int main() {
         return 1;
     }
 
-    backend_t prog = {};
+    middleend_t prog = {};
 
     prog.set_dump_ostream(dump);
     prog.init(istream);
     prog.dump();
-    prog.translate_to_asm(dump_file);
+    prog.deserialization(dump_file);
     prog.dtor();
 
     if (fclose(istream) == EOF) {

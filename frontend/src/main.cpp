@@ -7,7 +7,7 @@
 const char* del_images = "./del_images.sh";
 
 int main() {
-    FILE* logger = fopen("logger.txt", "w");
+    FILE* logger = fopen("./logs/logger.txt", "w");
     if (logger == nullptr) {
         LOG(ERROR, "Failed to open a logger ostream\n");
         return 1;
@@ -21,19 +21,19 @@ int main() {
         LOG(ERROR, "Failed to execute bash script %s\n", del_images);
     }
 
-    FILE* file = fopen("data/dump.html", "wb");
+    FILE* file = fopen("./data/dump.html", "wb");
     if (file == nullptr) {
         LOG(ERROR, "Failed to open a dump ostream\n");
         return 1;
     }
 
-    FILE* istream = fopen("data/input/data.txt", "r");
+    FILE* istream = fopen("./data/input/data.txt", "r");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;
     }
 
-    FILE* dump_file = fopen("./backend/out.txt", "w");
+    FILE* dump_file = fopen("./out.txt", "w");
     if (istream == nullptr) {
         LOG(ERROR, "Failed to open an input data file\n");
         return 1;

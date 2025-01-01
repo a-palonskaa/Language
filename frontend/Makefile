@@ -11,20 +11,21 @@ CFLAGS = -Wall -std=c++17 -Wall -Wextra -Weffc++ -Wc++14-compat -Wmissing-declar
 		 -Wlong-long -Wopenmp -fcheck-new -fsized-deallocation -fstack-protector 		 \
 		 -fstrict-overflow -fno-omit-frame-pointer -Wlarger-than=8192 -Wstack-protector  \
 		 -fPIE -Werror=vla
-COMMON_DIR = build/libs
+COMMON_DIR = ../build/libs
 LIBS_DIR = $(COMMON_DIR)
 
-BUILD_DIR = build
+BUILD_DIR = ../build/frontend
 
-INCLUDES = include common/logger common/text
+INCLUDES = include ../common/logger ../common/text
 SOURCES = dump.cpp main.cpp parser.cpp prog_tree.cpp tokenization.cpp serialization.cpp
 EXCLUDE_SOURCES = main.cpp
 OBJECTS = $(addprefix $(BUILD_DIR)/src/, $(SOURCES:%.cpp=%.o))
 OBJECTS_FOR_LIB = $(filter-out $(addprefix $(BUILD_DIR)/src/, $(EXCLUDE_SOURCES:%.cpp=%.o)), $(OBJECTS))
 
 DEPS = $(OBJECTS:%.o=%.d)
+LIBS = ../build/libs/libmylibrary.a
+EXECUTABLE = ../build/front
 
-EXECUTABLE = build/diff
 CFLAGS += $(addprefix -I, $(INCLUDES))
 LDFLAGS = -L$(LIBS_DIR) -lcommon
 
@@ -41,9 +42,9 @@ $(OBJECTS): $(BUILD_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) -MP -MMD -c $< -o $@
 
-libs: build/libs/libmylibrary.a
+libs: $(LIBS)
 
-build/libs/libmylibrary.a: $(OBJECTS_FOR_LIB)
+$(LIBS): $(OBJECTS_FOR_LIB)
 	@mkdir -p $(BUILD_DIR)/libs
 	@ar rcs $@ $^
 
@@ -51,7 +52,7 @@ clean:
 	@for dir in $(SUBDIRS); do  \
 		$(MAKE) -C $$dir clean; \
 	done
-	@rm -f $(OBJECTS) $(EXECUTABLE) build/libs/libmylibrary.a
+	@rm -f $(OBJECTS) $(EXECUTABLE) $(LIBS)
 
 echo:
 	echo $(OBJECTS)

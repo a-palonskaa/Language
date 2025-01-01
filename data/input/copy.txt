@@ -1,0 +1,99 @@
+{OP: " ; "
+	{OP: " decl "
+		{FUNC: meow }
+
+		{OP: " ; "
+			{OP: " var "
+				{OP: " = "
+					{VAR: c }
+
+					{NUM: "0" }
+				}
+			}
+
+			{OP: " ; "
+				{OP: " if "
+					{OP: " == "
+						{VAR: c }
+
+						{NUM: "1" }
+					}
+
+					{OP: " = "
+						{VAR: c }
+
+						{NUM: "9" }
+					}
+				}
+			}
+		}
+	}
+
+	{OP: " ; "
+		{OP: " decl "
+			{FUNC: main }
+
+			{OP: " ; "
+				{OP: " var "
+					{OP: " = "
+						{VAR: x }
+
+						{NUM: "0" }
+					}
+				}
+
+				{OP: " ; "
+					{OP: " call "
+						{VAR: meow }
+					}
+
+					{OP: " ; "
+						{OP: " ; "
+							{OP: " if "
+								{OP: " IAEQ "
+									{OP: " + "
+										{VAR: x }
+
+										{NUM: "2" }
+									}
+
+									{NUM: "3" }
+								}
+
+								{OP: " = "
+									{VAR: x }
+
+									{NUM: "7" }
+								}
+							}
+
+							{OP: " else "
+								{OP: " = "
+									{VAR: x }
+
+									{NUM: "1" }
+								}
+							}
+						}
+
+						{OP: " ; "
+							{OP: " call "
+								{VAR: meow }
+							}
+
+							{OP: " ; "
+								{OP: " var "
+									{OP: " = "
+										{VAR: y }
+
+										{VAR: x }
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
